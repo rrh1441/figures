@@ -13,6 +13,8 @@ import NotFound from "./pages/NotFound";
 // Components
 import OnboardingScreen from "./components/onboarding/OnboardingScreen";
 import AuthScreen from "./components/auth/AuthScreen";
+import GetStartedScreen from "./components/auth/GetStartedScreen";
+import ProveRealScreen from "./components/verification/ProveRealScreen";
 import HomeScreen from "./components/home/HomeScreen";
 import ProfileScreen from "./components/profile/ProfileScreen";
 import MessagingScreen from "./components/messaging/MessagingScreen";
@@ -47,6 +49,8 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/onboarding" element={<OnboardingScreen />} />
           <Route path="/auth" element={<AuthScreen />} />
+          <Route path="/get-started" element={<GetStartedScreen />} />
+          <Route path="/prove-real" element={<ProveRealScreen />} />
           <Route path="/home" element={<HomeScreen />} />
           <Route path="/profile" element={<ProfileScreen />} />
           <Route path="/messages" element={<MessagingListScreen />} />

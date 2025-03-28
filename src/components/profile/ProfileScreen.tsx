@@ -1,139 +1,235 @@
 
-import React from "react";
-import Layout from "../layout/Layout";
+import React, { useState } from "react";
+import { ArrowRight, Camera, CheckCircle2 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogHeader, 
+  DialogTitle,
+  DialogDescription,
+  DialogFooter
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 import VerificationBadge from "../verification/VerificationBadge";
-import { Edit, Settings, Plus } from "lucide-react";
+import { VerificationType } from "@/hooks/use-verification";
 
 const ProfileScreen: React.FC = () => {
-  const profile = {
-    name: "Daniel Morgan",
-    age: 32,
-    location: "San Francisco, CA",
-    bio: "Finance professional with a passion for travel, fitness, and great conversations. Looking for meaningful connections.",
-    images: [
-      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=774&q=80",
-      "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=774&q=80"
-    ],
-    verifications: {
-      identity: true,
-      networth: true,
-      education: true,
-      career: true,
-      height: true
-    },
-    details: {
-      education: "MBA, Stanford",
-      career: "Investment Banking",
-      networth: "$1M-$5M",
-      height: "6'0\""
+  const [name] = useState("Alex Johnson");
+  const [age] = useState(28);
+  const [profileImage, setProfileImage] = useState<string | null>(null);
+  const [isVerificationModalOpen, setIsVerificationModalOpen] = useState(false);
+  const [selectedVerifications, setSelectedVerifications] = useState<VerificationType[]>([]);
+  const [currentVerification, setCurrentVerification] = useState<VerificationType | null>(null);
+  const [verifiedItems, setVerifiedItems] = useState<VerificationType[]>(["identity"]);
+  const navigate = useNavigate();
+
+  const verificationOptions: { type: VerificationType; label: string }[] = [
+    { type: "networth", label: "Net Worth" },
+    { type: "height", label: "Height" },
+    { type: "education", label: "Education" },
+    { type: "career", label: "Job" },
+  ];
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setProfileImage(reader.result as string);
+      };
+      reader.readAsDataURL(file);
     }
   };
-  
+
+  const toggleVerificationSelection = (type: VerificationType) => {
+    setSelectedVerifications(prev => 
+      prev.includes(type) 
+        ? prev.filter(t => t !== type) 
+        : [...prev, type]
+    );
+  };
+
+  const startVerificationProcess = () => {
+    if (selectedVerifications.length > 0) {
+      setCurrentVerification(selectedVerifications[0]);
+      setIsVerificationModalOpen(false);
+    }
+  };
+
+  const completeCurrentVerification = () => {
+    if (currentVerification) {
+      setVerifiedItems(prev => [...prev, currentVerification]);
+      
+      // Move to next verification or finish
+      const currentIndex = selectedVerifications.indexOf(currentVerification);
+      if (currentIndex < selectedVerifications.length - 1) {
+        setCurrentVerification(selectedVerifications[currentIndex + 1]);
+      } else {
+        setCurrentVerification(null);
+        setSelectedVerifications([]);
+      }
+    }
+  };
+
   return (
-    <Layout>
-      <div className="flex flex-col pb-20">
-        {/* Header image */}
-        <div 
-          className="h-48 bg-cover bg-center"
-          style={{ backgroundImage: `url(${profile.images[0]})` }}
-        >
-          <div className="flex justify-end p-4">
-            <button className="w-10 h-10 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center">
-              <Settings size={20} className="text-white" />
-            </button>
-          </div>
-        </div>
-        
-        {/* Profile info */}
-        <div className="bg-card rounded-t-3xl -mt-6 relative z-10 px-4 py-6">
-          <div className="flex items-end gap-4 mb-6">
-            <div className="relative -mt-16">
-              <div 
-                className="w-24 h-24 rounded-full border-4 border-card bg-cover bg-center"
-                style={{ backgroundImage: `url(${profile.images[0]})` }}
-              />
-              <div className="absolute -bottom-1 -right-1">
-                <VerificationBadge type="identity" verified={true} />
-              </div>
-            </div>
-            
-            <div className="flex-1">
-              <h1 className="text-2xl font-bold flex items-center gap-2">
-                {profile.name}, {profile.age}
-              </h1>
-              <p className="text-muted-foreground">{profile.location}</p>
-            </div>
-            
-            <button className="btn-outline py-2 px-4 flex items-center gap-1">
-              <Edit size={16} />
-              <span>Edit</span>
-            </button>
-          </div>
-          
-          {/* Bio */}
-          <div className="mb-8">
-            <h2 className="text-lg font-semibold mb-2">About me</h2>
-            <p className="text-muted-foreground">{profile.bio}</p>
-          </div>
-          
-          {/* Verification details */}
-          <div className="mb-8">
-            <h2 className="text-lg font-semibold mb-4">Verified details</h2>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="flex items-center gap-3 p-3 bg-secondary/50 rounded-lg">
-                <VerificationBadge type="education" verified={profile.verifications.education} />
-                <div>
-                  <div className="text-sm text-muted-foreground">Education</div>
-                  <div className="font-medium">{profile.details.education}</div>
-                </div>
-              </div>
-              
-              <div className="flex items-center gap-3 p-3 bg-secondary/50 rounded-lg">
-                <VerificationBadge type="career" verified={profile.verifications.career} />
-                <div>
-                  <div className="text-sm text-muted-foreground">Career</div>
-                  <div className="font-medium">{profile.details.career}</div>
-                </div>
-              </div>
-              
-              <div className="flex items-center gap-3 p-3 bg-secondary/50 rounded-lg">
-                <VerificationBadge type="networth" verified={profile.verifications.networth} />
-                <div>
-                  <div className="text-sm text-muted-foreground">Net Worth</div>
-                  <div className="font-medium">{profile.details.networth}</div>
-                </div>
-              </div>
-              
-              <div className="flex items-center gap-3 p-3 bg-secondary/50 rounded-lg">
-                <VerificationBadge type="height" verified={profile.verifications.height} />
-                <div>
-                  <div className="text-sm text-muted-foreground">Height</div>
-                  <div className="font-medium">{profile.details.height}</div>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          {/* Photo gallery */}
-          <div>
-            <h2 className="text-lg font-semibold mb-4">Photos</h2>
-            <div className="grid grid-cols-3 gap-2">
-              {profile.images.map((image, index) => (
-                <div
-                  key={index}
-                  className="aspect-square rounded-lg bg-cover bg-center"
-                  style={{ backgroundImage: `url(${image})` }}
-                />
-              ))}
-              <button className="aspect-square rounded-lg bg-secondary/50 flex items-center justify-center">
-                <Plus size={24} className="text-muted-foreground" />
-              </button>
-            </div>
-          </div>
-        </div>
+    <div className="flex flex-col min-h-screen bg-black text-white">
+      {/* Header */}
+      <div className="px-4 py-6 border-b border-gray-800">
+        <h1 className="text-2xl font-bold">Your Profile</h1>
       </div>
-    </Layout>
+
+      {/* Profile Content */}
+      <div className="flex-1 p-4">
+        {/* Profile Image */}
+        <div className="flex flex-col items-center mb-8">
+          <div className="relative mb-4">
+            {profileImage ? (
+              <img 
+                src={profileImage} 
+                alt="Profile" 
+                className="w-32 h-32 rounded-full object-cover border-2 border-white"
+              />
+            ) : (
+              <div className="w-32 h-32 rounded-full bg-gray-800 flex items-center justify-center border-2 border-gray-700">
+                <Camera size={40} className="text-gray-500" />
+              </div>
+            )}
+            <label htmlFor="profile-image" className="absolute bottom-0 right-0 bg-white text-black rounded-full p-2 cursor-pointer">
+              <Camera size={20} />
+              <input 
+                type="file" 
+                id="profile-image" 
+                accept="image/*" 
+                className="hidden" 
+                onChange={handleImageChange}
+              />
+            </label>
+          </div>
+          <h2 className="text-2xl font-bold flex items-center gap-2">
+            {name}
+            <CheckCircle2 size={20} className="text-green-500" />
+          </h2>
+          <p className="text-gray-400">Age: {age}</p>
+        </div>
+
+        {/* Verification Status */}
+        <div className="mb-8">
+          <h3 className="text-xl font-semibold mb-4">Verified Information</h3>
+          <div className="grid grid-cols-2 gap-4">
+            {verificationOptions.map(({ type, label }) => (
+              <div key={type} className="bg-gray-900 p-4 rounded-lg flex items-center gap-3">
+                <VerificationBadge 
+                  type={type} 
+                  verified={verifiedItems.includes(type)} 
+                  size="md"
+                />
+                <div>
+                  <span className="text-sm text-gray-400">{label}</span>
+                  <p className="text-sm font-medium">
+                    {verifiedItems.includes(type) ? "Verified" : "Not Verified"}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Get Verified Button */}
+        <button 
+          onClick={() => setIsVerificationModalOpen(true)}
+          className="btn-primary w-full flex items-center justify-center gap-2 group"
+        >
+          <span>Get Verified</span>
+          <ArrowRight className="transition-transform duration-300 group-hover:translate-x-1" size={18} />
+        </button>
+      </div>
+
+      {/* Verification Selection Modal */}
+      <Dialog open={isVerificationModalOpen} onOpenChange={setIsVerificationModalOpen}>
+        <DialogContent className="bg-gray-900 border-gray-800 text-white">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold">Choose Verifications</DialogTitle>
+            <DialogDescription className="text-gray-400">
+              Select which aspects of your profile you would like to verify
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            {verificationOptions.map(({ type, label }) => (
+              <div key={type} className="flex items-center space-x-3 mb-4">
+                <input
+                  type="checkbox"
+                  id={`verify-${type}`}
+                  checked={selectedVerifications.includes(type) || verifiedItems.includes(type)}
+                  onChange={() => toggleVerificationSelection(type)}
+                  disabled={verifiedItems.includes(type)}
+                  className="w-5 h-5 rounded border-gray-700 bg-gray-800 text-white"
+                />
+                <Label 
+                  htmlFor={`verify-${type}`} 
+                  className={verifiedItems.includes(type) ? "text-gray-500" : "text-white"}
+                >
+                  {label} {verifiedItems.includes(type) && "(Already Verified)"}
+                </Label>
+              </div>
+            ))}
+          </div>
+          <DialogFooter>
+            <Button 
+              variant="outline" 
+              onClick={() => setIsVerificationModalOpen(false)}
+              className="bg-transparent border-gray-700 text-white hover:bg-gray-800"
+            >
+              Cancel
+            </Button>
+            <Button 
+              onClick={startVerificationProcess}
+              className="bg-white text-black hover:bg-gray-200"
+              disabled={selectedVerifications.length === 0}
+            >
+              Continue
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Individual Verification Screens */}
+      {currentVerification && (
+        <div className="fixed inset-0 bg-black flex flex-col z-50">
+          <div className="px-4 py-6 border-b border-gray-800">
+            <h1 className="text-2xl font-bold">
+              Verify {verificationOptions.find(v => v.type === currentVerification)?.label}
+            </h1>
+          </div>
+          <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
+            <div className="mb-8">
+              <VerificationBadge 
+                type={currentVerification} 
+                verified={false} 
+                size="lg"
+              />
+            </div>
+            <h2 className="text-xl font-bold mb-4">
+              Verify your {verificationOptions.find(v => v.type === currentVerification)?.label}
+            </h2>
+            <p className="text-gray-400 mb-8">
+              {currentVerification === "networth" && "Connect with Plaid to verify your assets and net worth"}
+              {currentVerification === "height" && "Upload a measurement photo to verify your height"}
+              {currentVerification === "education" && "Connect to National Student Clearinghouse to verify your education"}
+              {currentVerification === "career" && "Connect to LinkedIn to verify your current and past positions"}
+            </p>
+            <button 
+              onClick={completeCurrentVerification}
+              className="btn-primary w-full flex items-center justify-center gap-2 group"
+            >
+              <span>Complete Verification</span>
+              <ArrowRight className="transition-transform duration-300 group-hover:translate-x-1" size={18} />
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
 
