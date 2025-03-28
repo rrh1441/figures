@@ -9,23 +9,14 @@ const OnboardingScreen: React.FC = () => {
   
   const slides = [
     {
-      title: "Real",
-      description: (
-        <div className="flex flex-col space-y-2 items-center">
-          <span>- People</span>
-          <span>- Age</span>
-          <span>- Job</span>
-          <span>- Education</span>
-          <span>- Net worth</span>
-          <span>- Height</span>
-        </div>
-      ),
-      isCustomDescription: true
+      icon: Shield,
+      title: "Real people only",
+      description: "We verify identity through facial recognition and government ID",
     },
     {
       icon: BadgeCheck,
-      title: "Trust us, not strangers",
-      description: "We verify what matters so you don't have to take their word for it",
+      title: "Verified information",
+      description: "Education, career, and demographic information are all verified",
     },
     {
       icon: DollarSign,
@@ -38,7 +29,7 @@ const OnboardingScreen: React.FC = () => {
     if (currentStep < slides.length - 1) {
       setCurrentStep(currentStep + 1);
     } else {
-      navigate("/get-started");
+      navigate("/auth");
     }
   };
 
@@ -78,16 +69,14 @@ const OnboardingScreen: React.FC = () => {
           className="text-center transform transition-all duration-500 ease-out animate-scale-up"
           style={{animationDelay: '300ms'}}
         >
-          {!slides[currentStep].isCustomDescription && slides[currentStep].icon && React.createElement(slides[currentStep].icon, { 
-            size: 64, 
-            className: "text-white animate-pulse-subtle mx-auto mb-8" 
-          })}
+          <div className="flex justify-center mb-8">
+            {React.createElement(slides[currentStep].icon, { 
+              size: 64, 
+              className: "text-white animate-pulse-subtle" 
+            })}
+          </div>
           <h1 className="text-3xl font-bold mb-4">{slides[currentStep].title}</h1>
-          {slides[currentStep].isCustomDescription ? (
-            slides[currentStep].description
-          ) : (
-            <p className="text-gray-400 text-lg">{slides[currentStep].description}</p>
-          )}
+          <p className="text-gray-400 text-lg">{slides[currentStep].description}</p>
         </div>
       </div>
 

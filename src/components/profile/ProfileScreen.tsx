@@ -1,155 +1,138 @@
-import React, { useState } from "react";
+
+import React from "react";
 import Layout from "../layout/Layout";
-import ProfileCard from "./ProfileCard";
-import { Button } from "@/components/ui/button";
-import { Camera, User, ChevronRight, Shield } from "lucide-react";
-import { useVerification, VerificationType } from "@/hooks/use-verification";
-import VerificationModal from "../verification/VerificationModal";
-import VerificationScreen from "../verification/VerificationScreen";
-import { VerificationBadge } from "../verification/VerificationBadge";
+import VerificationBadge from "../verification/VerificationBadge";
+import { Edit, Settings, Plus } from "lucide-react";
 
 const ProfileScreen: React.FC = () => {
-  const [avatar, setAvatar] = useState<string | null>(null);
-  const [isVerificationModalOpen, setIsVerificationModalOpen] = useState(false);
-  const [currentVerification, setCurrentVerification] = useState<VerificationType | null>(null);
-  const { verifiedStatus, verifyItem } = useVerification();
-  
-  // Simulated user data (in a real app, this would come from Plaid or a backend)
-  const userData = {
-    name: "Alex Johnson",
-    age: 28,
-    // Other profile information
-  };
-  
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        setAvatar(event.target?.result as string);
-      };
-      reader.readAsDataURL(file);
+  const profile = {
+    name: "Daniel Morgan",
+    age: 32,
+    location: "San Francisco, CA",
+    bio: "Finance professional with a passion for travel, fitness, and great conversations. Looking for meaningful connections.",
+    images: [
+      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=774&q=80",
+      "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
+      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=774&q=80"
+    ],
+    verifications: {
+      identity: true,
+      networth: true,
+      education: true,
+      career: true,
+      height: true
+    },
+    details: {
+      education: "MBA, Stanford",
+      career: "Investment Banking",
+      networth: "$1M-$5M",
+      height: "6'0\""
     }
   };
-  
-  const handleVerificationSelect = (types: VerificationType[]) => {
-    if (types.length > 0) {
-      setCurrentVerification(types[0]);
-    }
-  };
-  
-  const handleVerificationComplete = () => {
-    setCurrentVerification(null);
-  };
-  
-  if (currentVerification) {
-    return (
-      <VerificationScreen 
-        type={currentVerification}
-        onComplete={handleVerificationComplete}
-        onBack={handleVerificationComplete}
-      />
-    );
-  }
   
   return (
     <Layout>
-      <div className="flex flex-col space-y-6 p-4">
-        <div className="flex flex-col items-center">
-          <div className="relative mb-4">
-            <div className="w-32 h-32 rounded-full bg-muted flex items-center justify-center overflow-hidden border-2 border-primary">
-              {avatar ? (
-                <img src={avatar} alt="Profile" className="w-full h-full object-cover" />
-              ) : (
-                <User size={64} className="text-muted-foreground" />
-              )}
-            </div>
-            <label htmlFor="avatar-upload" className="absolute bottom-0 right-0 bg-primary text-white rounded-full p-2 cursor-pointer">
-              <Camera size={20} />
-              <input 
-                id="avatar-upload" 
-                type="file" 
-                accept="image/*"
-                className="hidden"
-                onChange={handleFileChange}
+      <div className="flex flex-col pb-20">
+        {/* Header image */}
+        <div 
+          className="h-48 bg-cover bg-center"
+          style={{ backgroundImage: `url(${profile.images[0]})` }}
+        >
+          <div className="flex justify-end p-4">
+            <button className="w-10 h-10 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center">
+              <Settings size={20} className="text-white" />
+            </button>
+          </div>
+        </div>
+        
+        {/* Profile info */}
+        <div className="bg-card rounded-t-3xl -mt-6 relative z-10 px-4 py-6">
+          <div className="flex items-end gap-4 mb-6">
+            <div className="relative -mt-16">
+              <div 
+                className="w-24 h-24 rounded-full border-4 border-card bg-cover bg-center"
+                style={{ backgroundImage: `url(${profile.images[0]})` }}
               />
-            </label>
+              <div className="absolute -bottom-1 -right-1">
+                <VerificationBadge type="identity" verified={true} />
+              </div>
+            </div>
+            
+            <div className="flex-1">
+              <h1 className="text-2xl font-bold flex items-center gap-2">
+                {profile.name}, {profile.age}
+              </h1>
+              <p className="text-muted-foreground">{profile.location}</p>
+            </div>
+            
+            <button className="btn-outline py-2 px-4 flex items-center gap-1">
+              <Edit size={16} />
+              <span>Edit</span>
+            </button>
           </div>
           
-          <h1 className="text-2xl font-bold">{userData.name}</h1>
-          <p className="text-muted-foreground">{userData.age} years old</p>
-          <p className="text-sm text-muted-foreground mt-1">New York, NY</p>
-        </div>
-        
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-xl font-semibold">Verified Information</h2>
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={() => setIsVerificationModalOpen(true)}
-              className="flex items-center gap-1"
-            >
-              Get Verified <ChevronRight size={16} />
-            </Button>
+          {/* Bio */}
+          <div className="mb-8">
+            <h2 className="text-lg font-semibold mb-2">About me</h2>
+            <p className="text-muted-foreground">{profile.bio}</p>
           </div>
           
-          <div className="grid grid-cols-2 gap-2">
-            <div className="flex items-center p-3 rounded-lg border">
-              <Shield className="mr-2" size={18} />
-              <div>
-                <p className="text-sm font-medium">Identity</p>
-                <VerificationBadge verified={verifiedStatus.identity} />
+          {/* Verification details */}
+          <div className="mb-8">
+            <h2 className="text-lg font-semibold mb-4">Verified details</h2>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="flex items-center gap-3 p-3 bg-secondary/50 rounded-lg">
+                <VerificationBadge type="education" verified={profile.verifications.education} />
+                <div>
+                  <div className="text-sm text-muted-foreground">Education</div>
+                  <div className="font-medium">{profile.details.education}</div>
+                </div>
               </div>
-            </div>
-            
-            <div className="flex items-center p-3 rounded-lg border">
-              <Shield className="mr-2" size={18} />
-              <div>
-                <p className="text-sm font-medium">Net Worth</p>
-                <VerificationBadge verified={verifiedStatus.networth} />
+              
+              <div className="flex items-center gap-3 p-3 bg-secondary/50 rounded-lg">
+                <VerificationBadge type="career" verified={profile.verifications.career} />
+                <div>
+                  <div className="text-sm text-muted-foreground">Career</div>
+                  <div className="font-medium">{profile.details.career}</div>
+                </div>
               </div>
-            </div>
-            
-            <div className="flex items-center p-3 rounded-lg border">
-              <Shield className="mr-2" size={18} />
-              <div>
-                <p className="text-sm font-medium">Education</p>
-                <VerificationBadge verified={verifiedStatus.education} />
+              
+              <div className="flex items-center gap-3 p-3 bg-secondary/50 rounded-lg">
+                <VerificationBadge type="networth" verified={profile.verifications.networth} />
+                <div>
+                  <div className="text-sm text-muted-foreground">Net Worth</div>
+                  <div className="font-medium">{profile.details.networth}</div>
+                </div>
               </div>
-            </div>
-            
-            <div className="flex items-center p-3 rounded-lg border">
-              <Shield className="mr-2" size={18} />
-              <div>
-                <p className="text-sm font-medium">Job</p>
-                <VerificationBadge verified={verifiedStatus.career} />
-              </div>
-            </div>
-            
-            <div className="flex items-center p-3 rounded-lg border">
-              <Shield className="mr-2" size={18} />
-              <div>
-                <p className="text-sm font-medium">Height</p>
-                <VerificationBadge verified={verifiedStatus.height} />
+              
+              <div className="flex items-center gap-3 p-3 bg-secondary/50 rounded-lg">
+                <VerificationBadge type="height" verified={profile.verifications.height} />
+                <div>
+                  <div className="text-sm text-muted-foreground">Height</div>
+                  <div className="font-medium">{profile.details.height}</div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-        
-        <div className="space-y-4">
-          <h2 className="text-xl font-semibold">About Me</h2>
-          <Button variant="outline" className="w-full justify-start">
-            Add your bio
-          </Button>
+          
+          {/* Photo gallery */}
+          <div>
+            <h2 className="text-lg font-semibold mb-4">Photos</h2>
+            <div className="grid grid-cols-3 gap-2">
+              {profile.images.map((image, index) => (
+                <div
+                  key={index}
+                  className="aspect-square rounded-lg bg-cover bg-center"
+                  style={{ backgroundImage: `url(${image})` }}
+                />
+              ))}
+              <button className="aspect-square rounded-lg bg-secondary/50 flex items-center justify-center">
+                <Plus size={24} className="text-muted-foreground" />
+              </button>
+            </div>
+          </div>
         </div>
       </div>
-      
-      <VerificationModal 
-        open={isVerificationModalOpen}
-        onOpenChange={setIsVerificationModalOpen}
-        onSelectVerifications={handleVerificationSelect}
-      />
     </Layout>
   );
 };
