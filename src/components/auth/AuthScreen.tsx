@@ -1,10 +1,10 @@
 
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Eye, EyeOff, Camera, ArrowRight, Loader2 } from "lucide-react";
+import { Eye, EyeOff, Camera, ArrowRight, Loader2, CheckCircle } from "lucide-react";
 
 const AuthScreen: React.FC = () => {
-  const [step, setStep] = useState<"login" | "facial">("login");
+  const [step, setStep] = useState<"intro" | "login" | "facial">("intro");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -33,6 +33,61 @@ const AuthScreen: React.FC = () => {
       setFacialScanComplete(true);
     }, 3000);
   };
+
+  if (step === "intro") {
+    return (
+      <div className="flex flex-col h-screen bg-black text-white">
+        <div className="flex-1 flex flex-col items-center justify-center px-8">
+          <h1 className="text-3xl font-bold mb-10 text-center">FIGURES</h1>
+          
+          <div className="w-full space-y-6 mb-10">
+            <h2 className="text-2xl font-bold mb-8">Real</h2>
+            
+            <div className="space-y-4">
+              <div className="flex items-center gap-2">
+                <CheckCircle className="text-primary" size={20} />
+                <p className="text-xl">People</p>
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <CheckCircle className="text-primary" size={20} />
+                <p className="text-xl">Age</p>
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <CheckCircle className="text-primary" size={20} />
+                <p className="text-xl">Job</p>
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <CheckCircle className="text-primary" size={20} />
+                <p className="text-xl">Education</p>
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <CheckCircle className="text-primary" size={20} />
+                <p className="text-xl">Net worth</p>
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <CheckCircle className="text-primary" size={20} />
+                <p className="text-xl">Height</p>
+              </div>
+            </div>
+            
+            <p className="text-xl font-medium mt-8 text-center">Trust us, not strangers</p>
+          </div>
+          
+          <button 
+            onClick={() => navigate("/get-started")}
+            className="btn-primary w-full"
+          >
+            Get Started
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col h-screen bg-background">
